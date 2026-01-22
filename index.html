@@ -1,0 +1,2253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Workforce IQ | Ivy Rehab</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0a0a0a;
+      --bg-secondary: #111111;
+      --bg-tertiary: #1a1a1a;
+      --bg-hover: #222222;
+      --border-primary: #262626;
+      --border-secondary: #333333;
+      --text-primary: #fafafa;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --accent-green: #22c55e;
+      --accent-green-dim: rgba(34, 197, 94, 0.15);
+      --accent-red: #ef4444;
+      --accent-red-dim: rgba(239, 68, 68, 0.15);
+      --accent-yellow: #eab308;
+      --accent-yellow-dim: rgba(234, 179, 8, 0.15);
+      --accent-blue: #3b82f6;
+      --accent-blue-dim: rgba(59, 130, 246, 0.15);
+      --ivy-green: #1B4D3E;
+    }
+
+    * {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      margin: 0;
+      min-height: 100vh;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-primary); }
+    ::-webkit-scrollbar-thumb { background: var(--border-secondary); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+    /* Layout */
+    .app-container {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 240px;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border-primary);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border-primary);
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 12px;
+      overflow-y: auto;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-size: 14px;
+      margin-bottom: 2px;
+    }
+
+    .nav-item:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+
+    .nav-item.active {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+
+    .nav-item svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .nav-section-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 16px 12px 8px;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .top-bar {
+      height: 60px;
+      border-bottom: 1px solid var(--border-primary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      background: var(--bg-secondary);
+      flex-shrink: 0;
+    }
+
+    .content-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-primary);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-primary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .card-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .card-body {
+      padding: 20px;
+    }
+
+    /* Metric Cards */
+    .metric-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-primary);
+      border-radius: 12px;
+      padding: 20px;
+      position: relative;
+    }
+
+    .metric-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--accent-green);
+      border-radius: 12px 12px 0 0;
+    }
+
+    .metric-card.critical::before { background: var(--accent-red); }
+    .metric-card.warning::before { background: var(--accent-yellow); }
+    .metric-card.info::before { background: var(--accent-blue); }
+
+    .metric-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .metric-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+
+    .metric-value span {
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+
+    .metric-change {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    .metric-change.positive { color: var(--accent-green); }
+    .metric-change.negative { color: var(--accent-red); }
+
+    /* Tables */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .data-table th {
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 12px 16px;
+      background: var(--bg-tertiary);
+      border-bottom: 1px solid var(--border-primary);
+    }
+
+    .data-table td {
+      padding: 12px 16px;
+      font-size: 13px;
+      border-bottom: 1px solid var(--border-primary);
+      vertical-align: middle;
+    }
+
+    .data-table tr:hover td {
+      background: var(--bg-hover);
+    }
+
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .badge-critical {
+      background: var(--accent-red-dim);
+      color: var(--accent-red);
+    }
+
+    .badge-warning {
+      background: var(--accent-yellow-dim);
+      color: var(--accent-yellow);
+    }
+
+    .badge-success {
+      background: var(--accent-green-dim);
+      color: var(--accent-green);
+    }
+
+    .badge-info {
+      background: var(--accent-blue-dim);
+      color: var(--accent-blue);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--accent-green);
+      color: #000;
+    }
+
+    .btn-primary:hover {
+      background: #16a34a;
+    }
+
+    .btn-secondary {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-secondary);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-hover);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+    }
+
+    .btn-ghost:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+
+    /* Form Elements */
+    .select-input {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-primary);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 13px;
+      color: var(--text-primary);
+      cursor: pointer;
+    }
+
+    .select-input:focus {
+      outline: none;
+      border-color: var(--accent-green);
+    }
+
+    /* Search */
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-primary);
+      border-radius: 8px;
+      padding: 8px 12px;
+    }
+
+    .search-box input {
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      font-size: 13px;
+      width: 200px;
+    }
+
+    .search-box input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .search-box input:focus {
+      outline: none;
+    }
+
+    /* Progress Bar */
+    .progress-bar {
+      height: 6px;
+      background: var(--bg-tertiary);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+
+    /* View Sections */
+    .view-section {
+      display: none;
+    }
+
+    .view-section.active {
+      display: block;
+    }
+
+    /* Chart Container - CRITICAL FIX */
+    .chart-container {
+      position: relative;
+      height: 200px;
+      width: 100%;
+    }
+
+    .chart-container-lg {
+      height: 280px;
+    }
+
+    .chart-container canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    /* Sparkline */
+    .sparkline-container {
+      height: 40px;
+      margin-top: 12px;
+    }
+
+    /* Grid Layouts */
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .grid-12 {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 20px;
+    }
+
+    /* Heatmap */
+    .heatmap-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 4px;
+    }
+
+    .heatmap-cell {
+      aspect-ratio: 1;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+      position: relative;
+    }
+
+    .heatmap-cell:hover {
+      transform: scale(1.15);
+      z-index: 10;
+    }
+
+    .heatmap-cell[data-tooltip]:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-primary);
+      border: 1px solid var(--border-secondary);
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      white-space: nowrap;
+      z-index: 100;
+      margin-bottom: 4px;
+    }
+
+    /* Agent Actions */
+    .agent-panel {
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.02) 100%);
+      border: 1px solid rgba(34, 197, 94, 0.2);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .agent-action-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-primary);
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+
+    .agent-action-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .agent-checkbox {
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--border-secondary);
+      border-radius: 4px;
+      cursor: pointer;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .agent-checkbox.checked {
+      background: var(--accent-green);
+      border-color: var(--accent-green);
+    }
+
+    /* Data Source Tags */
+    .source-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 6px;
+      background: var(--bg-tertiary);
+      border-radius: 4px;
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    /* Timeline */
+    .timeline-item {
+      position: relative;
+      padding-left: 24px;
+      padding-bottom: 20px;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 6px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent-green);
+    }
+
+    .timeline-item::after {
+      content: '';
+      position: absolute;
+      left: 4px;
+      top: 20px;
+      width: 2px;
+      height: calc(100% - 14px);
+      background: var(--border-primary);
+    }
+
+    .timeline-item:last-child::after {
+      display: none;
+    }
+
+    .timeline-item.pending::before {
+      background: var(--text-muted);
+    }
+
+    .timeline-item.warning::before {
+      background: var(--accent-yellow);
+    }
+
+    /* Tooltip */
+    .tooltip {
+      position: relative;
+    }
+
+    .tooltip-content {
+      display: none;
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-primary);
+      border: 1px solid var(--border-secondary);
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      width: 280px;
+      z-index: 1000;
+      margin-bottom: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .tooltip:hover .tooltip-content {
+      display: block;
+    }
+
+    /* Data Dictionary Drawer */
+    .drawer {
+      position: fixed;
+      top: 0;
+      right: -400px;
+      width: 400px;
+      height: 100vh;
+      background: var(--bg-secondary);
+      border-left: 1px solid var(--border-primary);
+      z-index: 1000;
+      transition: right 0.3s ease;
+      overflow-y: auto;
+    }
+
+    .drawer.open {
+      right: 0;
+    }
+
+    .drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+      display: none;
+    }
+
+    .drawer-overlay.open {
+      display: block;
+    }
+
+    /* Alert Banner */
+    .alert-banner {
+      background: linear-gradient(90deg, var(--accent-red-dim) 0%, transparent 100%);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    /* Animations */
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+
+    /* Formula Display */
+    .formula-box {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-primary);
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+      font-size: 11px;
+      color: var(--accent-green);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 36px; height: 36px; background: var(--ivy-green); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+          </div>
+          <div>
+            <div style="font-weight: 600; font-size: 15px;">Workforce IQ</div>
+            <div style="font-size: 11px; color: var(--text-muted);">Ivy Rehab</div>
+          </div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-item active" data-view="overview">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7" rx="1"/>
+            <rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/>
+            <rect x="14" y="14" width="7" height="7" rx="1"/>
+          </svg>
+          Overview
+        </div>
+
+        <div class="nav-section-label">Intelligence</div>
+
+        <div class="nav-item" data-view="talent">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          Talent Acquisition
+        </div>
+
+        <div class="nav-item" data-view="retention">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+          Retention
+        </div>
+
+        <div class="nav-item" data-view="finance">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="1" x2="12" y2="23"/>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+          Financial Impact
+        </div>
+
+        <div class="nav-item" data-view="capacity">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+          </svg>
+          Capacity Planning
+        </div>
+
+        <div class="nav-section-label">Actions</div>
+
+        <div class="nav-item" onclick="openAgentQueue()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+          Agent Queue
+          <span class="badge badge-success" style="margin-left: auto;">12</span>
+        </div>
+
+        <div class="nav-item" onclick="openDataDictionary()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          </svg>
+          Data Dictionary
+        </div>
+      </nav>
+
+      <div style="padding: 16px; border-top: 1px solid var(--border-primary);">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 32px; height: 32px; background: var(--bg-tertiary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600;">JD</div>
+          <div>
+            <div style="font-size: 13px; font-weight: 500;">Jane Doe</div>
+            <div style="font-size: 11px; color: var(--text-muted);">VP, Talent</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Top Bar -->
+      <header class="top-bar">
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <h1 style="font-size: 18px; font-weight: 600;" id="viewTitle">Overview</h1>
+          <span style="font-size: 12px; color: var(--text-muted);">Last updated: Jan 21, 2026 at 9:42 AM</span>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div class="search-box">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="M21 21l-4.35-4.35"/>
+            </svg>
+            <input type="text" placeholder="Search positions, clinics..." id="globalSearch">
+          </div>
+
+          <select class="select-input" id="regionFilter" onchange="applyFilters()">
+            <option value="all">All Regions</option>
+            <option value="northeast">Northeast</option>
+            <option value="midwest">Midwest</option>
+            <option value="southeast">Southeast</option>
+            <option value="southwest">Southwest</option>
+            <option value="west">West</option>
+          </select>
+
+          <select class="select-input" id="specialtyFilter" onchange="applyFilters()">
+            <option value="all">All Specialties</option>
+            <option value="pt">Physical Therapy</option>
+            <option value="ot">Occupational Therapy</option>
+            <option value="slp">Speech Language</option>
+          </select>
+
+          <button class="btn btn-ghost" style="position: relative;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+            <span class="pulse" style="position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: var(--accent-red); border-radius: 50%;"></span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Content Area -->
+      <div class="content-area">
+        <!-- ==================== OVERVIEW VIEW ==================== -->
+        <section id="view-overview" class="view-section active">
+          <!-- Alert Banner -->
+          <div class="alert-banner">
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <div style="width: 40px; height: 40px; background: var(--accent-red-dim); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-red)" stroke-width="2">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                  <line x1="12" y1="9" x2="12" y2="13"/>
+                  <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+              </div>
+              <div>
+                <div style="font-weight: 600; color: #fca5a5;">7 clinicians flagged as critical churn risk (90%+ probability)</div>
+                <div style="font-size: 13px; color: var(--text-muted);">Combined monthly revenue exposure: $364K • Immediate intervention recommended</div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 12px;">
+              <button class="btn btn-secondary" onclick="switchView('retention')">Review Actions</button>
+              <button class="btn btn-ghost" onclick="dismissAlert()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- KPI Row -->
+          <div class="grid-4" style="margin-bottom: 20px;">
+            <div class="metric-card critical">
+              <div class="metric-label">Revenue at Risk (Monthly)</div>
+              <div class="metric-value">$8.2<span>M</span></div>
+              <div class="metric-change negative">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/>
+                  <polyline points="17 18 23 18 23 12"/>
+                </svg>
+                +12% vs last month
+              </div>
+              <div class="sparkline-container">
+                <canvas id="sparkRevRisk"></canvas>
+              </div>
+              <div class="tooltip" style="position: absolute; top: 12px; right: 12px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                  <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                <div class="tooltip-content">
+                  <div style="font-weight: 600; margin-bottom: 8px;">Calculation</div>
+                  <div class="formula-box" style="margin-bottom: 8px;">Σ(Open FTE × Visits/Day × RPV × Work Days)</div>
+                  <div style="font-size: 11px; color: var(--text-muted);">
+                    <strong>Sources:</strong> Workday (positions), WebPT (visits), Finance GL (RPV)<br>
+                    <strong>Update:</strong> Real-time from ATS
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="metric-card warning">
+              <div class="metric-label">Avg Time-to-Fill</div>
+              <div class="metric-value">67<span> days</span></div>
+              <div class="metric-change negative">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/>
+                </svg>
+                +8 days vs target (55d)
+              </div>
+              <div class="sparkline-container">
+                <canvas id="sparkTTF"></canvas>
+              </div>
+            </div>
+
+            <div class="metric-card warning">
+              <div class="metric-label">Annualized Turnover</div>
+              <div class="metric-value">18.2<span>%</span></div>
+              <div class="metric-change negative">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/>
+                </svg>
+                87 employees flagged high risk
+              </div>
+              <div class="sparkline-container">
+                <canvas id="sparkChurn"></canvas>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-label">Recoverable Revenue</div>
+              <div class="metric-value" style="color: var(--accent-green);">$2.4<span>M</span></div>
+              <div class="metric-change positive">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                </svg>
+                With current pipeline + retention
+              </div>
+              <div class="sparkline-container">
+                <canvas id="sparkRecover"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Main Grid -->
+          <div class="grid-12">
+            <!-- Priority Worklist -->
+            <div class="card" style="grid-column: span 8;">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Priority Worklist</div>
+                  <div class="card-subtitle">AI-ranked by (Revenue Impact × 0.4) + (Days Open × 0.3) + (Churn Backfill × 0.3)</div>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                  <button class="btn btn-ghost btn-sm filter-btn active" data-filter="all">All</button>
+                  <button class="btn btn-ghost btn-sm filter-btn" data-filter="critical">Critical</button>
+                  <button class="btn btn-ghost btn-sm filter-btn" data-filter="high">High</button>
+                </div>
+              </div>
+              <div style="max-height: 380px; overflow-y: auto;">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Position / Location</th>
+                      <th style="text-align: center;">Priority</th>
+                      <th style="text-align: center;">Days Open</th>
+                      <th style="text-align: right;">Rev Impact/Mo</th>
+                      <th>Pipeline</th>
+                      <th>Suggested Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="priorityTableBody">
+                    <!-- Populated by JS -->
+                  </tbody>
+                </table>
+              </div>
+              <div style="padding: 12px 16px; border-top: 1px solid var(--border-primary); display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 12px; color: var(--text-muted);">Showing top 10 of 142 open positions</span>
+                <button class="btn btn-ghost" onclick="switchView('talent')">View all positions →</button>
+              </div>
+            </div>
+
+            <!-- Churn Watchlist -->
+            <div class="card" style="grid-column: span 4;">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Churn Watchlist</div>
+                  <div class="card-subtitle">ML-predicted 60-90 day risk</div>
+                </div>
+                <span class="badge badge-critical">7 Critical</span>
+              </div>
+              <div style="max-height: 300px; overflow-y: auto;">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Employee</th>
+                      <th style="text-align: center;">Risk</th>
+                      <th>Top Driver</th>
+                    </tr>
+                  </thead>
+                  <tbody id="churnTableBody">
+                    <!-- Populated by JS -->
+                  </tbody>
+                </table>
+              </div>
+              <div style="padding: 12px 16px; border-top: 1px solid var(--border-primary);">
+                <button class="btn btn-ghost" style="width: 100%;" onclick="switchView('retention')">View all at-risk employees →</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Row -->
+          <div class="grid-2" style="margin-top: 20px;">
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Time-to-Fill Trend</div>
+                  <div class="card-subtitle">By specialty • Last 6 months</div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="ttfTrendChart"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Capacity Heatmap</div>
+                  <div class="card-subtitle">% staffed by clinic • Hover for details</div>
+                </div>
+                <div style="display: flex; gap: 12px; font-size: 11px;">
+                  <span style="display: flex; align-items: center; gap: 4px;">
+                    <span style="width: 12px; height: 12px; background: var(--accent-red); border-radius: 2px;"></span>
+                    &lt;75%
+                  </span>
+                  <span style="display: flex; align-items: center; gap: 4px;">
+                    <span style="width: 12px; height: 12px; background: var(--accent-yellow); border-radius: 2px;"></span>
+                    75-90%
+                  </span>
+                  <span style="display: flex; align-items: center; gap: 4px;">
+                    <span style="width: 12px; height: 12px; background: var(--accent-green); border-radius: 2px;"></span>
+                    &gt;90%
+                  </span>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="heatmap-grid" id="capacityHeatmap">
+                  <!-- Populated by JS -->
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-top: 16px; font-size: 12px; color: var(--text-muted);">
+                  <span>12 clinics critical</span>
+                  <span>28 clinics at risk</span>
+                  <span>87 clinics healthy</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Agent Actions Panel -->
+          <div class="agent-panel" style="margin-top: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+              <div style="display: flex; gap: 12px; align-items: flex-start;">
+                <div style="width: 40px; height: 40px; background: var(--accent-green-dim); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-green)" stroke-width="2">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                  </svg>
+                </div>
+                <div>
+                  <div style="font-weight: 600; font-size: 15px;">Agent Ready to Execute</div>
+                  <div style="font-size: 13px; color: var(--text-muted);">12 actions queued • Est. quarterly impact: $840K revenue protected</div>
+                </div>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn btn-primary" onclick="executeSelectedActions()">Execute Selected</button>
+                <button class="btn btn-secondary">Review All</button>
+              </div>
+            </div>
+
+            <div class="grid-3" id="agentActionsGrid">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== TALENT ACQUISITION VIEW ==================== -->
+        <section id="view-talent" class="view-section">
+          <div class="grid-4" style="margin-bottom: 20px;">
+            <div class="metric-card">
+              <div class="metric-label">Open Requisitions</div>
+              <div class="metric-value">142</div>
+              <div class="metric-change negative">+18 vs last month</div>
+            </div>
+            <div class="metric-card warning">
+              <div class="metric-label">Avg Time-to-Fill</div>
+              <div class="metric-value">67<span> days</span></div>
+              <div class="metric-change negative">Target: 55 days</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Active Pipeline</div>
+              <div class="metric-value">847</div>
+              <div class="metric-change positive">+12% vs last month</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Offer Accept Rate</div>
+              <div class="metric-value">78<span>%</span></div>
+              <div class="metric-change positive">+3% vs target</div>
+            </div>
+          </div>
+
+          <!-- Full Positions Table -->
+          <div class="card" style="margin-bottom: 20px;">
+            <div class="card-header">
+              <div>
+                <div class="card-title">All Open Positions</div>
+                <div class="card-subtitle">Sorted by AI priority score</div>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <select class="select-input" style="font-size: 12px;">
+                  <option>All Statuses</option>
+                  <option>Active Sourcing</option>
+                  <option>Interviewing</option>
+                  <option>Offer Pending</option>
+                </select>
+                <button class="btn btn-secondary">Export</button>
+              </div>
+            </div>
+            <div style="max-height: 400px; overflow-y: auto;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Req ID</th>
+                    <th>Position</th>
+                    <th>Clinic</th>
+                    <th>Region</th>
+                    <th style="text-align: center;">Days Open</th>
+                    <th style="text-align: right;">Revenue Impact</th>
+                    <th style="text-align: center;">Pipeline</th>
+                    <th>Stage</th>
+                    <th style="text-align: center;">Priority</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="talentTableBody">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Charts Row -->
+          <div class="grid-3">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">Pipeline Funnel</div>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="pipelineFunnelChart"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">Source Effectiveness</div>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="sourceChart"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">TTF by Specialty</div>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="ttfBySpecialtyChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TA Agent Actions -->
+          <div class="agent-panel" style="margin-top: 20px;">
+            <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 16px;">
+              <div style="width: 36px; height: 36px; background: var(--accent-green-dim); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-green)" stroke-width="2">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                </svg>
+              </div>
+              <div>
+                <div style="font-weight: 600;">TA Agent Actions</div>
+                <div style="font-size: 12px; color: var(--text-muted);">5 actions ready for positions > 60 days open</div>
+              </div>
+            </div>
+            <div id="taAgentActions">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== RETENTION VIEW ==================== -->
+        <section id="view-retention" class="view-section">
+          <div class="grid-4" style="margin-bottom: 20px;">
+            <div class="metric-card critical">
+              <div class="metric-label">Critical Risk (90%+)</div>
+              <div class="metric-value">7</div>
+              <div class="metric-change negative">$364K/mo exposure</div>
+            </div>
+            <div class="metric-card warning">
+              <div class="metric-label">High Risk (70-90%)</div>
+              <div class="metric-value">23</div>
+              <div class="metric-change negative">$892K/mo exposure</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Watch List (50-70%)</div>
+              <div class="metric-value">57</div>
+              <div class="metric-change">Early intervention window</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Interventions Active</div>
+              <div class="metric-value">18</div>
+              <div class="metric-change positive">72% success rate</div>
+            </div>
+          </div>
+
+          <!-- Churn Risk Table -->
+          <div class="card" style="margin-bottom: 20px;">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Churn Risk Watchlist</div>
+                <div class="card-subtitle">ML model trained on 3 years of turnover data • Updated daily</div>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <select class="select-input" style="font-size: 12px;">
+                  <option>All Risk Levels</option>
+                  <option>Critical (90%+)</option>
+                  <option>High (70-90%)</option>
+                  <option>Watch (50-70%)</option>
+                </select>
+                <button class="btn btn-secondary">Export</button>
+              </div>
+            </div>
+            <div style="max-height: 350px; overflow-y: auto;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Employee</th>
+                    <th>Role / Clinic</th>
+                    <th style="text-align: center;">Tenure</th>
+                    <th style="text-align: center;">Risk Score</th>
+                    <th>Top Risk Drivers</th>
+                    <th style="text-align: right;">Revenue/Mo</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="retentionTableBody">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Charts Row -->
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">Churn Risk Drivers</div>
+                <div class="card-subtitle">Weighted contribution to risk score</div>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="churnDriversChart"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">Intervention Timeline</div>
+                <div class="card-subtitle">Upcoming & recent actions</div>
+              </div>
+              <div class="card-body" style="max-height: 220px; overflow-y: auto;">
+                <div id="interventionTimeline">
+                  <!-- Populated by JS -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Retention Agent Actions -->
+          <div class="agent-panel" style="margin-top: 20px;">
+            <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 16px;">
+              <div style="width: 36px; height: 36px; background: var(--accent-green-dim); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-green)" stroke-width="2">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                </svg>
+              </div>
+              <div>
+                <div style="font-weight: 600;">Retention Agent Actions</div>
+                <div style="font-size: 12px; color: var(--text-muted);">7 critical interventions ready</div>
+              </div>
+            </div>
+            <div id="retentionAgentActions">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== FINANCE VIEW ==================== -->
+        <section id="view-finance" class="view-section">
+          <div class="grid-4" style="margin-bottom: 20px;">
+            <div class="metric-card critical">
+              <div class="metric-label">Monthly Vacancy Cost</div>
+              <div class="metric-value">$8.2<span>M</span></div>
+              <div class="metric-change negative">Lost revenue opportunity</div>
+            </div>
+            <div class="metric-card warning">
+              <div class="metric-label">Agency Spend (MTD)</div>
+              <div class="metric-value">$1.4<span>M</span></div>
+              <div class="metric-change negative">18% above budget</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Churn Cost (Annual)</div>
+              <div class="metric-value">$4.8<span>M</span></div>
+              <div class="metric-change">Hiring + training + vacancy</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">EBITDA Impact</div>
+              <div class="metric-value">-$3.4<span>M</span></div>
+              <div class="metric-change negative">From workforce gaps</div>
+            </div>
+          </div>
+
+          <!-- Regional Revenue Impact Table -->
+          <div class="card" style="margin-bottom: 20px;">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Regional Revenue Impact</div>
+                <div class="card-subtitle">Vacancy cost by region • Click row to drill into clinics</div>
+              </div>
+              <button class="btn btn-secondary">Export to Excel</button>
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Region</th>
+                  <th style="text-align: center;">Open Positions</th>
+                  <th style="text-align: right;">Monthly Loss</th>
+                  <th style="text-align: right;">Agency Spend</th>
+                  <th style="text-align: right;">Total Cost</th>
+                  <th style="text-align: center;">Capacity %</th>
+                  <th>Trend</th>
+                </tr>
+              </thead>
+              <tbody id="financeRegionTable">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Charts Row -->
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">Revenue Impact Projection</div>
+                <div class="card-subtitle">Based on pipeline & hiring velocity</div>
+              </div>
+              <div class="card-body">
+                <div class="chart-container chart-container-lg">
+                  <canvas id="revenueProjectionChart"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">Cost Breakdown</div>
+                <div class="card-subtitle">Monthly workforce-related costs</div>
+              </div>
+              <div class="card-body">
+                <div class="chart-container chart-container-lg">
+                  <canvas id="costBreakdownChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== CAPACITY VIEW ==================== -->
+        <section id="view-capacity" class="view-section">
+          <div class="grid-4" style="margin-bottom: 20px;">
+            <div class="metric-card">
+              <div class="metric-label">Total Clinics</div>
+              <div class="metric-value">127</div>
+              <div class="metric-change">Across 5 regions</div>
+            </div>
+            <div class="metric-card warning">
+              <div class="metric-label">Avg Capacity</div>
+              <div class="metric-value">87<span>%</span></div>
+              <div class="metric-change negative">Target: 92%</div>
+            </div>
+            <div class="metric-card critical">
+              <div class="metric-label">Critical Clinics</div>
+              <div class="metric-value">12</div>
+              <div class="metric-change negative">&lt;75% staffed</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Visits at Risk</div>
+              <div class="metric-value">2,840</div>
+              <div class="metric-change negative">Weekly visit gap</div>
+            </div>
+          </div>
+
+          <!-- Large Capacity Heatmap -->
+          <div class="card" style="margin-bottom: 20px;">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Clinic Capacity Map</div>
+                <div class="card-subtitle">Each cell = 1 clinic • Sorted by region</div>
+              </div>
+              <div style="display: flex; gap: 16px; font-size: 12px;">
+                <span style="display: flex; align-items: center; gap: 6px;">
+                  <span style="width: 14px; height: 14px; background: #dc2626; border-radius: 3px;"></span>
+                  Critical (&lt;75%)
+                </span>
+                <span style="display: flex; align-items: center; gap: 6px;">
+                  <span style="width: 14px; height: 14px; background: #eab308; border-radius: 3px;"></span>
+                  At Risk (75-90%)
+                </span>
+                <span style="display: flex; align-items: center; gap: 6px;">
+                  <span style="width: 14px; height: 14px; background: #22c55e; border-radius: 3px;"></span>
+                  Healthy (&gt;90%)
+                </span>
+              </div>
+            </div>
+            <div class="card-body">
+              <div id="largeCapacityHeatmap" style="display: grid; grid-template-columns: repeat(16, 1fr); gap: 6px;">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Critical Clinics Table -->
+          <div class="card" style="margin-bottom: 20px;">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Critical Clinics</div>
+                <div class="card-subtitle">Clinics below 75% staffing capacity</div>
+              </div>
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Clinic</th>
+                  <th>Region</th>
+                  <th style="text-align: center;">Capacity</th>
+                  <th style="text-align: center;">Open Positions</th>
+                  <th style="text-align: right;">Weekly Visit Gap</th>
+                  <th style="text-align: right;">Revenue Loss/Mo</th>
+                  <th>Pipeline Status</th>
+                </tr>
+              </thead>
+              <tbody id="criticalClinicsTable">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Capacity Chart -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Capacity Forecast</div>
+              <div class="card-subtitle">Based on pipeline velocity & projected attrition</div>
+            </div>
+            <div class="card-body">
+              <div class="chart-container chart-container-lg">
+                <canvas id="capacityForecastChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Data Dictionary Drawer -->
+  <div class="drawer-overlay" id="drawerOverlay" onclick="closeDataDictionary()"></div>
+  <div class="drawer" id="dataDictionary">
+    <div style="padding: 20px; border-bottom: 1px solid var(--border-primary); display: flex; justify-content: space-between; align-items: center;">
+      <h2 style="font-size: 16px; font-weight: 600;">Data Dictionary</h2>
+      <button class="btn btn-ghost" onclick="closeDataDictionary()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div style="padding: 20px;">
+      <div style="margin-bottom: 24px;">
+        <h3 style="font-size: 13px; font-weight: 600; color: var(--accent-green); margin-bottom: 12px;">RAW DATA SOURCES</h3>
+
+        <div style="margin-bottom: 16px;">
+          <div style="font-weight: 500; font-size: 13px; margin-bottom: 8px;">ATS (iCIMS)</div>
+          <div style="font-size: 12px; color: var(--text-muted); line-height: 1.6;">
+            requisition_id, job_title, specialty, clinic_id, req_open_date, req_status, candidate_id, application_date, source, current_stage, offer_amount, start_date
+          </div>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <div style="font-weight: 500; font-size: 13px; margin-bottom: 8px;">HRIS (Workday)</div>
+          <div style="font-size: 12px; color: var(--text-muted); line-height: 1.6;">
+            employee_id, hire_date, termination_date, term_reason, tenure_days, job_title, clinic_id, salary, manager_id, performance_rating
+          </div>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <div style="font-weight: 500; font-size: 13px; margin-bottom: 8px;">Clinic System (WebPT)</div>
+          <div style="font-size: 12px; color: var(--text-muted); line-height: 1.6;">
+            clinic_id, clinician_id, appointment_date, visit_type, units_billed, patient_cancellations, hours_scheduled
+          </div>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <div style="font-weight: 500; font-size: 13px; margin-bottom: 8px;">Finance (NetSuite)</div>
+          <div style="font-size: 12px; color: var(--text-muted); line-height: 1.6;">
+            cost_center, clinic_id, budget_amount, actual_amount, agency_invoice_amount, revenue_per_visit
+          </div>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <div style="font-weight: 500; font-size: 13px; margin-bottom: 8px;">Engagement (Culture Amp)</div>
+          <div style="font-size: 12px; color: var(--text-muted); line-height: 1.6;">
+            employee_id, survey_date, engagement_score, manager_score, growth_score, workload_score, eNPS
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 24px;">
+        <h3 style="font-size: 13px; font-weight: 600; color: var(--accent-green); margin-bottom: 12px;">CALCULATED METRICS</h3>
+
+        <div style="margin-bottom: 12px;">
+          <div style="font-weight: 500; font-size: 12px;">Time-to-Fill (TTF)</div>
+          <div class="formula-box" style="margin-top: 4px;">start_date - req_open_date</div>
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <div style="font-weight: 500; font-size: 12px;">Revenue Impact (Monthly)</div>
+          <div class="formula-box" style="margin-top: 4px;">Open_FTE × Visits/Day × RPV × 21</div>
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <div style="font-weight: 500; font-size: 12px;">Priority Score</div>
+          <div class="formula-box" style="margin-top: 4px;">(Rev_Impact × 0.4) + (Days_Open × 0.3) + (Churn_Backfill × 0.3)</div>
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <div style="font-weight: 500; font-size: 12px;">Churn Risk Score</div>
+          <div class="formula-box" style="margin-top: 4px;">ML Model: tenure, engagement, comp_ratio, manager_score, peer_departures</div>
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <div style="font-weight: 500; font-size: 12px;">Capacity Utilization</div>
+          <div class="formula-box" style="margin-top: 4px;">Actual_FTE / Budgeted_FTE × 100</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ============================================================
+    // DATA MODELS - Based on raw fields from TA/Ops/Finance systems
+    // ============================================================
+
+    const priorityData = [
+      { id: 'REQ-2847', title: 'Physical Therapist', clinic: 'Westfield Ortho', region: 'Northeast', daysOpen: 89, revImpact: 48200, pipeline: 2, stage: 'Interview', priority: 'critical', specialty: 'pt', source: 'ATS', churnBackfill: true },
+      { id: 'REQ-2901', title: 'Occupational Therapist', clinic: 'Edison Peds', region: 'Northeast', daysOpen: 76, revImpact: 38500, pipeline: 1, stage: 'Sourcing', priority: 'critical', specialty: 'ot', source: 'ATS', churnBackfill: true },
+      { id: 'REQ-2756', title: 'Speech Therapist', clinic: 'Newark Central', region: 'Northeast', daysOpen: 102, revImpact: 35800, pipeline: 3, stage: 'Offer', priority: 'critical', specialty: 'slp', source: 'ATS', churnBackfill: false },
+      { id: 'REQ-2934', title: 'Physical Therapist', clinic: 'Cherry Hill', region: 'Northeast', daysOpen: 67, revImpact: 44100, pipeline: 4, stage: 'Interview', priority: 'high', specialty: 'pt', source: 'ATS', churnBackfill: false },
+      { id: 'REQ-2889', title: 'PTA', clinic: 'Morristown', region: 'Northeast', daysOpen: 54, revImpact: 28600, pipeline: 6, stage: 'Screen', priority: 'high', specialty: 'pt', source: 'ATS', churnBackfill: false },
+      { id: 'REQ-2912', title: 'Occupational Therapist', clinic: 'Princeton Neuro', region: 'Northeast', daysOpen: 45, revImpact: 41200, pipeline: 5, stage: 'Interview', priority: 'high', specialty: 'ot', source: 'ATS', churnBackfill: false },
+      { id: 'REQ-2967', title: 'Physical Therapist', clinic: 'Trenton Sports', region: 'Northeast', daysOpen: 38, revImpact: 46800, pipeline: 8, stage: 'Screen', priority: 'medium', specialty: 'pt', source: 'ATS', churnBackfill: false },
+      { id: 'REQ-2845', title: 'COTA', clinic: 'Hamilton Peds', region: 'Northeast', daysOpen: 62, revImpact: 22400, pipeline: 3, stage: 'Interview', priority: 'medium', specialty: 'ot', source: 'ATS', churnBackfill: false },
+      { id: 'REQ-2998', title: 'Speech Therapist', clinic: 'Bridgewater', region: 'Northeast', daysOpen: 29, revImpact: 34200, pipeline: 7, stage: 'Sourcing', priority: 'medium', specialty: 'slp', source: 'ATS', churnBackfill: false },
+      { id: 'REQ-3012', title: 'Physical Therapist', clinic: 'Summit Ortho', region: 'Northeast', daysOpen: 21, revImpact: 47500, pipeline: 12, stage: 'Screen', priority: 'low', specialty: 'pt', source: 'ATS', churnBackfill: false },
+    ];
+
+    const churnData = [
+      { id: 'EMP-4521', name: 'Sarah Chen', role: 'PT', clinic: 'Westfield Ortho', tenure: 14, riskScore: 94, drivers: ['Comp below market', 'Manager change'], revMonth: 52000, status: 'No action', source: 'HRIS+Survey' },
+      { id: 'EMP-3892', name: 'Marcus Williams', role: 'OT', clinic: 'Edison Peds', tenure: 18, riskScore: 92, drivers: ['Peer departures', 'Workload'], revMonth: 48000, status: 'No action', source: 'HRIS+Survey' },
+      { id: 'EMP-5234', name: 'Jennifer Park', role: 'SLP', clinic: 'Newark Central', tenure: 8, riskScore: 91, drivers: ['Engagement drop', 'Commute'], revMonth: 44000, status: 'Scheduled', source: 'HRIS+Survey' },
+      { id: 'EMP-4102', name: 'David Thompson', role: 'PT', clinic: 'Cherry Hill', tenure: 24, riskScore: 88, drivers: ['No promotion path', 'Comp'], revMonth: 56000, status: 'No action', source: 'HRIS+Survey' },
+      { id: 'EMP-3567', name: 'Amanda Foster', role: 'PT', clinic: 'Morristown', tenure: 11, riskScore: 86, drivers: ['Workload spike', 'Schedule'], revMonth: 51000, status: 'In progress', source: 'HRIS+Survey' },
+      { id: 'EMP-4789', name: 'Robert Kim', role: 'OT', clinic: 'Princeton Neuro', tenure: 6, riskScore: 82, drivers: ['Onboarding issues', 'Culture fit'], revMonth: 46000, status: 'No action', source: 'HRIS+Survey' },
+      { id: 'EMP-3945', name: 'Lisa Martinez', role: 'PTA', clinic: 'Trenton Sports', tenure: 32, riskScore: 78, drivers: ['Career plateau', 'Manager'], revMonth: 32000, status: 'Scheduled', source: 'HRIS+Survey' },
+    ];
+
+    const regionData = [
+      { region: 'Northeast', openPositions: 48, monthlyLoss: 2840000, agencySpend: 520000, capacity: 84, trend: 'down' },
+      { region: 'Midwest', openPositions: 35, monthlyLoss: 1920000, agencySpend: 380000, capacity: 87, trend: 'up' },
+      { region: 'Southeast', openPositions: 28, monthlyLoss: 1680000, agencySpend: 290000, capacity: 89, trend: 'stable' },
+      { region: 'Southwest', openPositions: 19, monthlyLoss: 1140000, agencySpend: 180000, capacity: 91, trend: 'up' },
+      { region: 'West', openPositions: 12, monthlyLoss: 620000, agencySpend: 95000, capacity: 94, trend: 'up' },
+    ];
+
+    const clinicData = [];
+    for (let i = 0; i < 127; i++) {
+      const capacity = Math.random() < 0.1 ? Math.floor(Math.random() * 20) + 55 :
+                       Math.random() < 0.3 ? Math.floor(Math.random() * 15) + 75 :
+                       Math.floor(Math.random() * 10) + 90;
+      clinicData.push({
+        id: `CL-${1000 + i}`,
+        name: `Clinic ${i + 1}`,
+        region: ['Northeast', 'Midwest', 'Southeast', 'Southwest', 'West'][Math.floor(i / 26)],
+        capacity: Math.min(capacity, 100),
+        openPositions: capacity < 85 ? Math.floor(Math.random() * 3) + 1 : 0,
+        weeklyGap: capacity < 85 ? Math.floor((100 - capacity) * 2.5) : 0,
+        revLoss: capacity < 85 ? Math.floor((100 - capacity) * 1200) : 0
+      });
+    }
+
+    const agentActions = [
+      { id: 1, type: 'escalation', title: 'Escalate PT req to Regional Director', description: 'REQ-2847 open 89 days, $48K/mo impact', impact: '$144K/qtr', checked: true },
+      { id: 2, type: 'retention', title: 'Schedule stay interview', description: 'Sarah Chen - 94% churn risk, $52K/mo revenue', impact: '$156K/qtr', checked: true },
+      { id: 3, type: 'sourcing', title: 'Activate agency partnership', description: '3 critical PT positions in Northeast', impact: '$98K/qtr', checked: true },
+      { id: 4, type: 'retention', title: 'Trigger comp review', description: 'Marcus Williams - below market rate flagged', impact: '$144K/qtr', checked: false },
+      { id: 5, type: 'conversion', title: 'Convert agency to FTE', description: 'Agency PT at Cherry Hill - 90 days tenure', impact: '$72K/yr savings', checked: false },
+      { id: 6, type: 'posting', title: 'Boost job posting visibility', description: '5 positions with <3 applicants after 30 days', impact: '$85K/qtr', checked: false },
+    ];
+
+    // ============================================================
+    // CHART INSTANCES - Track for cleanup
+    // ============================================================
+    let charts = {};
+
+    // ============================================================
+    // INITIALIZATION
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', function() {
+      initNavigation();
+      renderOverviewView();
+    });
+
+    function initNavigation() {
+      document.querySelectorAll('.nav-item[data-view]').forEach(item => {
+        item.addEventListener('click', function() {
+          const view = this.dataset.view;
+          switchView(view);
+        });
+      });
+    }
+
+    function switchView(viewName) {
+      // Update nav
+      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+      document.querySelector(`.nav-item[data-view="${viewName}"]`)?.classList.add('active');
+
+      // Update view sections
+      document.querySelectorAll('.view-section').forEach(section => section.classList.remove('active'));
+      document.getElementById(`view-${viewName}`)?.classList.add('active');
+
+      // Update title
+      const titles = {
+        overview: 'Overview',
+        talent: 'Talent Acquisition',
+        retention: 'Retention Intelligence',
+        finance: 'Financial Impact',
+        capacity: 'Capacity Planning'
+      };
+      document.getElementById('viewTitle').textContent = titles[viewName] || 'Overview';
+
+      // Render view-specific content
+      setTimeout(() => {
+        switch(viewName) {
+          case 'overview': renderOverviewView(); break;
+          case 'talent': renderTalentView(); break;
+          case 'retention': renderRetentionView(); break;
+          case 'finance': renderFinanceView(); break;
+          case 'capacity': renderCapacityView(); break;
+        }
+      }, 50);
+    }
+
+    // ============================================================
+    // OVERVIEW VIEW
+    // ============================================================
+    function renderOverviewView() {
+      renderSparklines();
+      renderPriorityTable();
+      renderChurnTable();
+      renderTTFTrendChart();
+      renderCapacityHeatmap();
+      renderAgentActions();
+    }
+
+    function renderSparklines() {
+      const sparkConfig = {
+        type: 'line',
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false }, tooltip: { enabled: false } },
+          scales: { x: { display: false }, y: { display: false } },
+          elements: { point: { radius: 0 }, line: { borderWidth: 2, tension: 0.4 } }
+        }
+      };
+
+      // Revenue Risk Sparkline
+      destroyChart('sparkRevRisk');
+      charts.sparkRevRisk = new Chart(document.getElementById('sparkRevRisk'), {
+        ...sparkConfig,
+        data: {
+          labels: ['', '', '', '', '', '', ''],
+          datasets: [{ data: [6.8, 7.1, 7.4, 7.2, 7.8, 8.0, 8.2], borderColor: '#ef4444', fill: false }]
+        }
+      });
+
+      // TTF Sparkline
+      destroyChart('sparkTTF');
+      charts.sparkTTF = new Chart(document.getElementById('sparkTTF'), {
+        ...sparkConfig,
+        data: {
+          labels: ['', '', '', '', '', '', ''],
+          datasets: [{ data: [58, 61, 59, 63, 65, 64, 67], borderColor: '#eab308', fill: false }]
+        }
+      });
+
+      // Churn Sparkline
+      destroyChart('sparkChurn');
+      charts.sparkChurn = new Chart(document.getElementById('sparkChurn'), {
+        ...sparkConfig,
+        data: {
+          labels: ['', '', '', '', '', '', ''],
+          datasets: [{ data: [16.2, 16.8, 17.1, 17.5, 17.8, 18.0, 18.2], borderColor: '#eab308', fill: false }]
+        }
+      });
+
+      // Recovery Sparkline
+      destroyChart('sparkRecover');
+      charts.sparkRecover = new Chart(document.getElementById('sparkRecover'), {
+        ...sparkConfig,
+        data: {
+          labels: ['', '', '', '', '', '', ''],
+          datasets: [{ data: [1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4], borderColor: '#22c55e', fill: false }]
+        }
+      });
+    }
+
+    function renderPriorityTable() {
+      const tbody = document.getElementById('priorityTableBody');
+      tbody.innerHTML = priorityData.map(row => `
+        <tr>
+          <td>
+            <div style="font-weight: 500;">${row.title}</div>
+            <div style="font-size: 11px; color: var(--text-muted);">${row.clinic} • ${row.id}</div>
+          </td>
+          <td style="text-align: center;">
+            <span class="badge badge-${row.priority === 'critical' ? 'critical' : row.priority === 'high' ? 'warning' : 'info'}">
+              ${row.priority.charAt(0).toUpperCase() + row.priority.slice(1)}
+            </span>
+          </td>
+          <td style="text-align: center; font-weight: 500; color: ${row.daysOpen > 60 ? 'var(--accent-red)' : 'var(--text-primary)'};">
+            ${row.daysOpen}
+          </td>
+          <td style="text-align: right; font-weight: 600;">$${(row.revImpact / 1000).toFixed(1)}K</td>
+          <td>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div class="progress-bar" style="width: 60px;">
+                <div class="progress-fill" style="width: ${Math.min(row.pipeline * 10, 100)}%; background: ${row.pipeline < 3 ? 'var(--accent-red)' : row.pipeline < 6 ? 'var(--accent-yellow)' : 'var(--accent-green)'};"></div>
+              </div>
+              <span style="font-size: 12px;">${row.pipeline}</span>
+            </div>
+          </td>
+          <td>
+            <button class="btn btn-ghost" style="font-size: 11px; padding: 4px 8px;">
+              ${row.priority === 'critical' ? 'Escalate' : row.pipeline < 3 ? 'Boost posting' : 'Track'}
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderChurnTable() {
+      const tbody = document.getElementById('churnTableBody');
+      tbody.innerHTML = churnData.slice(0, 5).map(row => `
+        <tr>
+          <td>
+            <div style="font-weight: 500;">${row.name}</div>
+            <div style="font-size: 11px; color: var(--text-muted);">${row.role} • ${row.clinic}</div>
+          </td>
+          <td style="text-align: center;">
+            <span class="badge badge-${row.riskScore >= 90 ? 'critical' : row.riskScore >= 80 ? 'warning' : 'info'}">
+              ${row.riskScore}%
+            </span>
+          </td>
+          <td style="font-size: 12px; color: var(--text-muted);">${row.drivers[0]}</td>
+        </tr>
+      `).join('');
+    }
+
+    function renderTTFTrendChart() {
+      destroyChart('ttfTrendChart');
+      const ctx = document.getElementById('ttfTrendChart');
+      charts.ttfTrendChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan'],
+          datasets: [
+            { label: 'PT', data: [58, 62, 65, 64, 68, 72], borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.3 },
+            { label: 'OT', data: [52, 55, 58, 61, 63, 65], borderColor: '#22c55e', backgroundColor: 'rgba(34, 197, 94, 0.1)', fill: true, tension: 0.3 },
+            { label: 'SLP', data: [48, 50, 52, 55, 54, 58], borderColor: '#eab308', backgroundColor: 'rgba(234, 179, 8, 0.1)', fill: true, tension: 0.3 },
+            { label: 'Target', data: [55, 55, 55, 55, 55, 55], borderColor: '#71717a', borderDash: [5, 5], fill: false }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { color: '#a1a1aa', boxWidth: 12, padding: 16, font: { size: 11 } } }
+          },
+          scales: {
+            x: { grid: { color: '#262626' }, ticks: { color: '#71717a', font: { size: 11 } } },
+            y: { grid: { color: '#262626' }, ticks: { color: '#71717a', font: { size: 11 } }, beginAtZero: false, min: 40 }
+          }
+        }
+      });
+    }
+
+    function renderCapacityHeatmap() {
+      const container = document.getElementById('capacityHeatmap');
+      container.innerHTML = clinicData.slice(0, 60).map(clinic => {
+        const color = clinic.capacity < 75 ? '#dc2626' : clinic.capacity < 90 ? '#eab308' : '#22c55e';
+        return `<div class="heatmap-cell" style="background: ${color};" data-tooltip="${clinic.name}: ${clinic.capacity}%"></div>`;
+      }).join('');
+    }
+
+    function renderAgentActions() {
+      const container = document.getElementById('agentActionsGrid');
+      container.innerHTML = agentActions.slice(0, 6).map(action => `
+        <div class="agent-action-item">
+          <div class="agent-checkbox ${action.checked ? 'checked' : ''}" onclick="toggleActionCheck(${action.id})"></div>
+          <div style="flex: 1;">
+            <div style="font-weight: 500; font-size: 13px;">${action.title}</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">${action.description}</div>
+            <div style="font-size: 11px; color: var(--accent-green); margin-top: 4px;">Est. impact: ${action.impact}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ============================================================
+    // TALENT VIEW
+    // ============================================================
+    function renderTalentView() {
+      renderTalentTable();
+      renderPipelineFunnel();
+      renderSourceChart();
+      renderTTFBySpecialty();
+      renderTAAgentActions();
+    }
+
+    function renderTalentTable() {
+      const tbody = document.getElementById('talentTableBody');
+      tbody.innerHTML = priorityData.map(row => `
+        <tr>
+          <td style="font-family: monospace; font-size: 11px;">${row.id}</td>
+          <td>
+            <div style="font-weight: 500;">${row.title}</div>
+            <span class="source-tag">${row.specialty.toUpperCase()}</span>
+          </td>
+          <td>${row.clinic}</td>
+          <td>${row.region}</td>
+          <td style="text-align: center; font-weight: 500; color: ${row.daysOpen > 60 ? 'var(--accent-red)' : 'var(--text-primary)'};">${row.daysOpen}</td>
+          <td style="text-align: right; font-weight: 600;">$${(row.revImpact / 1000).toFixed(1)}K</td>
+          <td style="text-align: center;">${row.pipeline}</td>
+          <td><span class="badge badge-info">${row.stage}</span></td>
+          <td style="text-align: center;">
+            <span class="badge badge-${row.priority === 'critical' ? 'critical' : row.priority === 'high' ? 'warning' : 'info'}">
+              ${row.priority.charAt(0).toUpperCase() + row.priority.slice(1)}
+            </span>
+          </td>
+          <td><button class="btn btn-ghost" style="font-size: 11px; padding: 4px 8px;">View</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function renderPipelineFunnel() {
+      destroyChart('pipelineFunnelChart');
+      const ctx = document.getElementById('pipelineFunnelChart');
+      charts.pipelineFunnelChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Applied', 'Screened', 'Interview', 'Offer', 'Hired'],
+          datasets: [{
+            data: [847, 423, 156, 42, 28],
+            backgroundColor: ['#3b82f6', '#22c55e', '#eab308', '#f97316', '#22c55e'],
+            borderRadius: 4
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { color: '#262626' }, ticks: { color: '#71717a', font: { size: 11 } } },
+            y: { grid: { display: false }, ticks: { color: '#a1a1aa', font: { size: 11 } } }
+          }
+        }
+      });
+    }
+
+    function renderSourceChart() {
+      destroyChart('sourceChart');
+      const ctx = document.getElementById('sourceChart');
+      charts.sourceChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Indeed', 'LinkedIn', 'Referral', 'Agency', 'Direct'],
+          datasets: [{
+            data: [35, 25, 20, 12, 8],
+            backgroundColor: ['#3b82f6', '#22c55e', '#eab308', '#ef4444', '#8b5cf6'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'right', labels: { color: '#a1a1aa', boxWidth: 12, padding: 12, font: { size: 11 } } }
+          },
+          cutout: '60%'
+        }
+      });
+    }
+
+    function renderTTFBySpecialty() {
+      destroyChart('ttfBySpecialtyChart');
+      const ctx = document.getElementById('ttfBySpecialtyChart');
+      charts.ttfBySpecialtyChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['PT', 'OT', 'SLP', 'PTA', 'COTA'],
+          datasets: [
+            { label: 'Actual', data: [72, 65, 58, 45, 42], backgroundColor: '#3b82f6', borderRadius: 4 },
+            { label: 'Target', data: [55, 55, 55, 40, 40], backgroundColor: '#404040', borderRadius: 4 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { color: '#a1a1aa', boxWidth: 12, padding: 16, font: { size: 11 } } }
+          },
+          scales: {
+            x: { grid: { display: false }, ticks: { color: '#a1a1aa', font: { size: 11 } } },
+            y: { grid: { color: '#262626' }, ticks: { color: '#71717a', font: { size: 11 } }, beginAtZero: true }
+          }
+        }
+      });
+    }
+
+    function renderTAAgentActions() {
+      const container = document.getElementById('taAgentActions');
+      const taActions = agentActions.filter(a => ['escalation', 'sourcing', 'posting', 'conversion'].includes(a.type));
+      container.innerHTML = taActions.map(action => `
+        <div class="agent-action-item">
+          <div class="agent-checkbox ${action.checked ? 'checked' : ''}" onclick="toggleActionCheck(${action.id})"></div>
+          <div style="flex: 1;">
+            <div style="font-weight: 500; font-size: 13px;">${action.title}</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">${action.description}</div>
+          </div>
+          <div style="font-size: 12px; color: var(--accent-green);">${action.impact}</div>
+        </div>
+      `).join('');
+    }
+
+    // ============================================================
+    // RETENTION VIEW
+    // ============================================================
+    function renderRetentionView() {
+      renderRetentionTable();
+      renderChurnDriversChart();
+      renderInterventionTimeline();
+      renderRetentionAgentActions();
+    }
+
+    function renderRetentionTable() {
+      const tbody = document.getElementById('retentionTableBody');
+      tbody.innerHTML = churnData.map(row => `
+        <tr>
+          <td>
+            <div style="font-weight: 500;">${row.name}</div>
+            <div style="font-size: 11px; color: var(--text-muted);">${row.id}</div>
+          </td>
+          <td>
+            <div>${row.role}</div>
+            <div style="font-size: 11px; color: var(--text-muted);">${row.clinic}</div>
+          </td>
+          <td style="text-align: center;">${row.tenure} mo</td>
+          <td style="text-align: center;">
+            <span class="badge badge-${row.riskScore >= 90 ? 'critical' : row.riskScore >= 80 ? 'warning' : 'info'}">
+              ${row.riskScore}%
+            </span>
+          </td>
+          <td>
+            <div style="font-size: 12px;">${row.drivers.join(', ')}</div>
+          </td>
+          <td style="text-align: right; font-weight: 600;">$${(row.revMonth / 1000).toFixed(0)}K</td>
+          <td>
+            <span class="badge ${row.status === 'No action' ? 'badge-critical' : row.status === 'Scheduled' ? 'badge-warning' : 'badge-success'}">
+              ${row.status}
+            </span>
+          </td>
+          <td><button class="btn btn-ghost" style="font-size: 11px; padding: 4px 8px;">Intervene</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function renderChurnDriversChart() {
+      destroyChart('churnDriversChart');
+      const ctx = document.getElementById('churnDriversChart');
+      charts.churnDriversChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Compensation', 'Manager', 'Workload', 'Growth', 'Commute', 'Culture'],
+          datasets: [{
+            data: [28, 22, 18, 15, 10, 7],
+            backgroundColor: '#ef4444',
+            borderRadius: 4
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { color: '#262626' }, ticks: { color: '#71717a', font: { size: 11 } }, max: 35 },
+            y: { grid: { display: false }, ticks: { color: '#a1a1aa', font: { size: 11 } } }
+          }
+        }
+      });
+    }
+
+    function renderInterventionTimeline() {
+      const container = document.getElementById('interventionTimeline');
+      const interventions = [
+        { date: 'Today', action: 'Stay interview scheduled', employee: 'Jennifer Park', status: 'pending' },
+        { date: 'Tomorrow', action: 'Comp review meeting', employee: 'Sarah Chen', status: 'pending' },
+        { date: 'Jan 24', action: 'Manager 1:1 follow-up', employee: 'Amanda Foster', status: 'pending' },
+        { date: 'Jan 20', action: 'Workload rebalancing', employee: 'Amanda Foster', status: 'completed' },
+        { date: 'Jan 18', action: 'Career path discussion', employee: 'Lisa Martinez', status: 'completed' },
+      ];
+      container.innerHTML = interventions.map(item => `
+        <div class="timeline-item ${item.status}">
+          <div style="font-size: 11px; color: var(--text-muted);">${item.date}</div>
+          <div style="font-weight: 500; font-size: 13px; margin-top: 2px;">${item.action}</div>
+          <div style="font-size: 12px; color: var(--text-secondary);">${item.employee}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderRetentionAgentActions() {
+      const container = document.getElementById('retentionAgentActions');
+      const retentionActions = agentActions.filter(a => a.type === 'retention');
+      container.innerHTML = retentionActions.map(action => `
+        <div class="agent-action-item">
+          <div class="agent-checkbox ${action.checked ? 'checked' : ''}" onclick="toggleActionCheck(${action.id})"></div>
+          <div style="flex: 1;">
+            <div style="font-weight: 500; font-size: 13px;">${action.title}</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">${action.description}</div>
+          </div>
+          <div style="font-size: 12px; color: var(--accent-green);">${action.impact}</div>
+        </div>
+      `).join('');
+    }
+
+    // ============================================================
+    // FINANCE VIEW
+    // ============================================================
+    function renderFinanceView() {
+      renderFinanceRegionTable();
+      renderRevenueProjectionChart();
+      renderCostBreakdownChart();
+    }
+
+    function renderFinanceRegionTable() {
+      const tbody = document.getElementById('financeRegionTable');
+      tbody.innerHTML = regionData.map(row => `
+        <tr>
+          <td style="font-weight: 500;">${row.region}</td>
+          <td style="text-align: center;">${row.openPositions}</td>
+          <td style="text-align: right; font-weight: 600; color: var(--accent-red);">$${(row.monthlyLoss / 1000000).toFixed(2)}M</td>
+          <td style="text-align: right;">$${(row.agencySpend / 1000).toFixed(0)}K</td>
+          <td style="text-align: right; font-weight: 600;">$${((row.monthlyLoss + row.agencySpend) / 1000000).toFixed(2)}M</td>
+          <td style="text-align: center;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+              <div class="progress-bar" style="width: 60px;">
+                <div class="progress-fill" style="width: ${row.capacity}%; background: ${row.capacity < 85 ? 'var(--accent-red)' : row.capacity < 90 ? 'var(--accent-yellow)' : 'var(--accent-green)'};"></div>
+              </div>
+              <span style="font-size: 12px;">${row.capacity}%</span>
+            </div>
+          </td>
+          <td>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${row.trend === 'up' ? 'var(--accent-green)' : row.trend === 'down' ? 'var(--accent-red)' : 'var(--text-muted)'}" stroke-width="2">
+              ${row.trend === 'up' ? '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>' : row.trend === 'down' ? '<polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/>' : '<line x1="5" y1="12" x2="19" y2="12"/>'}
+            </svg>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderRevenueProjectionChart() {
+      destroyChart('revenueProjectionChart');
+      const ctx = document.getElementById('revenueProjectionChart');
+      charts.revenueProjectionChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+          datasets: [
+            { label: 'Projected Loss', data: [8.2, 7.8, 7.2, 6.5, 5.8, 5.2], borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', fill: true, tension: 0.3 },
+            { label: 'With Interventions', data: [8.2, 7.4, 6.4, 5.4, 4.5, 3.8], borderColor: '#22c55e', backgroundColor: 'rgba(34, 197, 94, 0.1)', fill: true, tension: 0.3 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { color: '#a1a1aa', boxWidth: 12, padding: 16, font: { size: 11 } } }
+          },
+          scales: {
+            x: { grid: { color: '#262626' }, ticks: { color: '#71717a', font: { size: 11 } } },
+            y: { grid: { color: '#262626' }, ticks: { color: '#71717a', font: { size: 11 }, callback: v => '$' + v + 'M' }, beginAtZero: true }
+          }
+        }
+      });
+    }
+
+    function renderCostBreakdownChart() {
+      destroyChart('costBreakdownChart');
+      const ctx = document.getElementById('costBreakdownChart');
+      charts.costBreakdownChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Vacancy Revenue Loss', 'Agency Spend', 'Overtime', 'Turnover Cost'],
+          datasets: [{
+            data: [8.2, 1.4, 0.6, 0.4],
+            backgroundColor: ['#ef4444', '#eab308', '#f97316', '#8b5cf6'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'right', labels: { color: '#a1a1aa', boxWidth: 12, padding: 12, font: { size: 11 } } }
+          },
+          cutout: '55%'
+        }
+      });
+    }
+
+    // ============================================================
+    // CAPACITY VIEW
+    // ============================================================
+    function renderCapacityView() {
+      renderLargeCapacityHeatmap();
+      renderCriticalClinicsTable();
+      renderCapacityForecastChart();
+    }
+
+    function renderLargeCapacityHeatmap() {
+      const container = document.getElementById('largeCapacityHeatmap');
+      container.innerHTML = clinicData.map(clinic => {
+        const color = clinic.capacity < 75 ? '#dc2626' : clinic.capacity < 90 ? '#eab308' : '#22c55e';
+        return `<div class="heatmap-cell" style="background: ${color};" data-tooltip="${clinic.name} (${clinic.region}): ${clinic.capacity}%"></div>`;
+      }).join('');
+    }
+
+    function renderCriticalClinicsTable() {
+      const criticalClinics = clinicData.filter(c => c.capacity < 75).slice(0, 8);
+      const tbody = document.getElementById('criticalClinicsTable');
+      tbody.innerHTML = criticalClinics.map(clinic => `
+        <tr>
+          <td style="font-weight: 500;">${clinic.name}</td>
+          <td>${clinic.region}</td>
+          <td style="text-align: center;">
+            <span class="badge badge-critical">${clinic.capacity}%</span>
+          </td>
+          <td style="text-align: center;">${clinic.openPositions}</td>
+          <td style="text-align: right;">${clinic.weeklyGap}</td>
+          <td style="text-align: right; font-weight: 600; color: var(--accent-red);">$${(clinic.revLoss).toLocaleString()}</td>
+          <td><span class="badge badge-warning">In Progress</span></td>
+        </tr>
+      `).join('');
+    }
+
+    function renderCapacityForecastChart() {
+      destroyChart('capacityForecastChart');
+      const ctx = document.getElementById('capacityForecastChart');
+      charts.capacityForecastChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+          datasets: [
+            { label: 'Projected Capacity', data: [87, 88, 89, 90, 91, 92], borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.3 },
+            { label: 'Target', data: [92, 92, 92, 92, 92, 92], borderColor: '#71717a', borderDash: [5, 5], fill: false }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { color: '#a1a1aa', boxWidth: 12, padding: 16, font: { size: 11 } } }
+          },
+          scales: {
+            x: { grid: { color: '#262626' }, ticks: { color: '#71717a', font: { size: 11 } } },
+            y: { grid: { color: '#262626' }, ticks: { color: '#71717a', font: { size: 11 }, callback: v => v + '%' }, min: 80, max: 100 }
+          }
+        }
+      });
+    }
+
+    // ============================================================
+    // UTILITY FUNCTIONS
+    // ============================================================
+    function destroyChart(id) {
+      if (charts[id]) {
+        charts[id].destroy();
+        delete charts[id];
+      }
+    }
+
+    function toggleActionCheck(id) {
+      const action = agentActions.find(a => a.id === id);
+      if (action) {
+        action.checked = !action.checked;
+        // Re-render current view's agent actions
+        const currentView = document.querySelector('.view-section.active').id.replace('view-', '');
+        if (currentView === 'overview') renderAgentActions();
+        else if (currentView === 'talent') renderTAAgentActions();
+        else if (currentView === 'retention') renderRetentionAgentActions();
+      }
+    }
+
+    function executeSelectedActions() {
+      const selected = agentActions.filter(a => a.checked);
+      alert(`Executing ${selected.length} actions:\n\n${selected.map(a => '• ' + a.title).join('\n')}`);
+    }
+
+    function dismissAlert() {
+      document.querySelector('.alert-banner').style.display = 'none';
+    }
+
+    function applyFilters() {
+      // Filter logic would go here
+      console.log('Filters applied:', {
+        region: document.getElementById('regionFilter').value,
+        specialty: document.getElementById('specialtyFilter').value
+      });
+    }
+
+    function openDataDictionary() {
+      document.getElementById('dataDictionary').classList.add('open');
+      document.getElementById('drawerOverlay').classList.add('open');
+    }
+
+    function closeDataDictionary() {
+      document.getElementById('dataDictionary').classList.remove('open');
+      document.getElementById('drawerOverlay').classList.remove('open');
+    }
+
+    function openAgentQueue() {
+      switchView('overview');
+      // Scroll to agent panel
+      setTimeout(() => {
+        document.querySelector('.agent-panel').scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  </script>
+</body>
+</html>
